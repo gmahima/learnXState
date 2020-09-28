@@ -8,10 +8,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "@xstate/react": "^0.8.1",
     "next": "9.5.3",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "styled-components": "^5.2.0",
-    "twin.macro": "^1.8.1"
+    "twin.macro": "^1.8.1",
+    "xstate": "^4.13.0"
   }
 }

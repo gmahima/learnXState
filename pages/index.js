@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styled from 'styled-components'
 import tw from 'twin.macro'
-import {Machine} from 'xstate'
+import {Machine, assign} from 'xstate'
 import {useMachine} from '@xstate/react'
 
 const data = [
@@ -28,37 +28,64 @@ const ReadMoreMachine = Machine({
     ]
     },
     clipped: {
+      entry: 'clip',
       on: {
         TOGGLE_CLIP: 'unclipped'
       }
     },
     unclipped: {
+      entry: 'unclip',
       on: {
         TOGGLE_CLIP: 'clipped'
       }
     },
     
-    disabled: {}
+    disabled: {
+      entry: "logDisabled"
+    }
   }
 }, {
   guards: {
     textLengthLessThan200: function(context) {
       console.log(context.content.length)
       return context.content.length < 200
-
-
     }
+  },
+  actions: {
+    logDisabled: (ctx) =>{
+      console.log(ctx.content, "disabled")
+    },
+    clip: assign(
+      (context) => {
+        return {
+          content: context.content, 
+          textToShow: context.content.slice(0,200)
+        }
+      }
+    ),
+    unclip: assign(
+      (context) => {
+        return {
+          content: context.content, 
+          textToShow: context.content
+        }
+      }
+    )
   }
+
 });
 
 const Card = ({content}) => {
   
   const [state, send] = useMachine(ReadMoreMachine, {
     context: {
-      content
+      content,
+      textToShow: content
     }
   })
-  const textToShow = state.value === "clipped" ? content.slice(0, 200): content
+  const {context}= state
+  const {textToShow} = context
+  //const textToShow = state.value === "clipped" ? content.slice(0, 200): content
   return (
   <div css={tw `bg-white p-12 rounded shadow mb-12`}> 
     <p>
